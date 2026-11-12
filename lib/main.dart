@@ -13,12 +13,16 @@ import 'state/cart_store.dart';
 import 'theme/app_theme.dart';
 import 'widgets/common_widgets.dart';
 
-void main() {
-  runApp(const OrganicHeritageApp());
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final store = await CartStore.load();
+  runApp(OrganicHeritageApp(store: store));
 }
 
 class OrganicHeritageApp extends StatefulWidget {
-  const OrganicHeritageApp({super.key});
+  const OrganicHeritageApp({super.key, this.store});
+
+  final CartStore? store;
 
   @override
   State<OrganicHeritageApp> createState() => _OrganicHeritageAppState();
@@ -26,8 +30,14 @@ class OrganicHeritageApp extends StatefulWidget {
 
 class _OrganicHeritageAppState extends State<OrganicHeritageApp> {
   final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
-  final CartStore _store = CartStore();
+  late final CartStore _store;
   int _selectedTab = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _store = widget.store ?? CartStore();
+  }
 
   void _openProduct(Product product) {
     _navigatorKey.currentState!.push(
@@ -143,10 +153,13 @@ class _OrganicHeritageAppState extends State<OrganicHeritageApp> {
             ),
           ],
         ),
-        bottomNavigationBar: StoreBottomNavigation(
-          selectedIndex: _selectedTab,
-          cartCount: _store.itemCount,
-          onSelected: (index) => setState(() => _selectedTab = index),
+        bottomNavigationBar: AnimatedBuilder(
+          animation: _store,
+          builder: (context, _) => StoreBottomNavigation(
+            selectedIndex: _selectedTab,
+            cartCount: _store.itemCount,
+            onSelected: (index) => setState(() => _selectedTab = index),
+          ),
         ),
       ),
     );

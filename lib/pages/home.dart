@@ -207,7 +207,7 @@ class HomePage extends StatelessWidget {
                         physics: const NeverScrollableScrollPhysics(),
                         mainAxisSpacing: 8,
                         crossAxisSpacing: 8,
-                        childAspectRatio: 1.35,
+                        childAspectRatio: 1.75,
                         children: const [
                           _ValueCard(
                             icon: Icons.verified_user_outlined,
@@ -641,12 +641,12 @@ class _ValueCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InfoCard(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(icon, size: 17, color: AppColors.green),
-          const SizedBox(height: 7),
+          const SizedBox(height: 5),
           Text(
             title,
             style: const TextStyle(
@@ -655,7 +655,7 @@ class _ValueCard extends StatelessWidget {
               fontWeight: FontWeight.w700,
             ),
           ),
-          const SizedBox(height: 3),
+          const SizedBox(height: 2),
           Expanded(
             child: Text(
               body,

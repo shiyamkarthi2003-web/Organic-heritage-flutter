@@ -42,8 +42,8 @@ class StoreHeader extends StatelessWidget {
         children: [
           Image.asset(
             'assets/organic_heritage_logo.png.png',
-            width: 30,
-            height: 30,
+            width: 38,
+            height: 38,
             fit: BoxFit.contain,
             semanticLabel: 'Organic Heritage logo',
           ),

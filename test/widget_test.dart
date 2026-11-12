@@ -3,8 +3,29 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:organic_heritage_flutter/pages/checkout.dart';
 import 'package:organic_heritage_flutter/main.dart';
+import 'package:organic_heritage_flutter/state/cart_store.dart';
+import 'package:organic_heritage_flutter/widgets/common_widgets.dart';
 
 void main() {
+  testWidgets('home value cards use compact vertical spacing', (tester) async {
+    await tester.pumpWidget(const OrganicHeritageApp());
+    await tester.scrollUntilVisible(
+      find.text('Pure & Authentic'),
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+
+    final valueCard = find.ancestor(
+      of: find.text('Pure & Authentic'),
+      matching: find.byType(InfoCard),
+    );
+    expect(valueCard, findsOneWidget);
+
+    final cardSize = tester.getSize(valueCard);
+    expect(cardSize.width / cardSize.height, greaterThan(1.6));
+  });
+
   testWidgets('shop to product to basket flow works', (tester) async {
     await tester.pumpWidget(const OrganicHeritageApp());
 
@@ -54,6 +75,41 @@ void main() {
     await tester.drag(checkoutScrollable.first, const Offset(0, -450));
     await tester.pumpAndSettle();
     expect(find.textContaining('Payment Protocol'), findsOneWidget);
+  });
+
+  testWidgets('bottom cart tab updates and shows added products', (
+    tester,
+  ) async {
+    final store = CartStore();
+    await tester.pumpWidget(OrganicHeritageApp(store: store));
+
+    await tester.tap(find.text('Shop').last);
+    await tester.pumpAndSettle();
+    await tester.drag(find.byType(Scrollable).first, const Offset(0, -260));
+    await tester.pumpAndSettle();
+
+    final addButton = find.widgetWithText(FilledButton, 'Add').first;
+    await tester.ensureVisible(addButton);
+    await tester.tap(addButton);
+    await tester.pumpAndSettle();
+
+    final cartItem = find
+        .ancestor(of: find.text('Cart').last, matching: find.byType(InkWell))
+        .first;
+    final cartBadge = find.descendant(
+      of: cartItem,
+      matching: find.byType(Badge),
+    );
+    expect(tester.widget<Badge>(cartBadge).isLabelVisible, isTrue);
+    expect(
+      find.descendant(of: cartBadge, matching: find.text('1')),
+      findsOneWidget,
+    );
+
+    await tester.tap(find.text('Cart').last);
+    await tester.pumpAndSettle();
+    expect(find.text('Your Sacred Basket'), findsOneWidget);
+    expect(store.productsInCart, hasLength(1));
   });
 
   testWidgets('grain catalog displays all attached package images', (
